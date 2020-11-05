@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_offline_chat/screens/client_screen.dart';
+import 'package:flutter_offline_chat/screens/server_screen.dart';
+import 'package:wifi_info_plugin/wifi_info_plugin.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,53 +16,170 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  WifiInfoWrapper _wifiObject;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    WifiInfoWrapper wifiObject;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      wifiObject = await WifiInfoPlugin.wifiDetails;
+    } on PlatformException {}
+    if (!mounted) return;
+
     setState(() {
-      _counter++;
+      _wifiObject = wifiObject;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    String ipAddress =
+        _wifiObject != null ? _wifiObject.ipAddress.toString() : "ip";
+
+    String routerIp =
+        _wifiObject != null ? _wifiObject.routerIp.toString() : "routerIp";
+    String dns1 = _wifiObject != null ? _wifiObject.dns1.toString() : "dns1";
+    String dns2 = _wifiObject != null ? _wifiObject.dns2.toString() : "dns2";
+    String bssId = _wifiObject != null ? _wifiObject.bssId.toString() : "bssId";
+    String ssid = _wifiObject != null ? _wifiObject.ssid.toString() : "ssid";
+    String macAddress =
+        _wifiObject != null ? _wifiObject.macAddress.toString() : "macAddress";
+    String linkSpeed =
+        _wifiObject != null ? _wifiObject.linkSpeed.toString() : "linkSpeed";
+    String signalStrength = _wifiObject != null
+        ? _wifiObject.signalStrength.toString()
+        : "signalStrength";
+    String frequency =
+        _wifiObject != null ? _wifiObject.frequency.toString() : "frequency";
+    String networkId =
+        _wifiObject != null ? _wifiObject.networkId.toString() : "networkId";
+    String connectionType = _wifiObject != null
+        ? _wifiObject.connectionType.toString()
+        : "connectionType";
+    String isHiddenSSid = _wifiObject != null
+        ? _wifiObject.isHiddenSSid.toString()
+        : "isHiddenSSid";
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Offline Chat'),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            Container(
+              width: double.maxFinite,
+              color: Colors.green,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Running on:' + ipAddress,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            Card(
+              child: ListTile(
+                title: Text('Client'),
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ClientScreen()),
+                  )
+                },
+              ),
+            ),
+            Card(
+              child: ListTile(
+                title: Text('Server'),
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ServerScreen()),
+                  )
+                },
+              ),
+            ),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text('Router Ip'),
+                    subtitle: Text(routerIp),
+                  ),
+                  ListTile(
+                    title: Text('DNS 1'),
+                    subtitle: Text(dns1),
+                  ),
+                  ListTile(
+                    title: Text('DNS 2'),
+                    subtitle: Text(dns2),
+                  ),
+                  ListTile(
+                    title: Text('bssId'),
+                    subtitle: Text(bssId),
+                  ),
+                  ListTile(
+                    title: Text('SSID'),
+                    subtitle: Text(ssid),
+                  ),
+                  ListTile(
+                    title: Text('Mac Address'),
+                    subtitle: Text(macAddress),
+                  ),
+                  ListTile(
+                    title: Text('Link Speed'),
+                    subtitle: Text(linkSpeed),
+                  ),
+                  ListTile(
+                    title: Text('Signal Strength'),
+                    subtitle: Text(signalStrength),
+                  ),
+                  ListTile(
+                    title: Text('Frequency'),
+                    subtitle: Text(frequency),
+                  ),
+                  ListTile(
+                    title: Text('NetworkId'),
+                    subtitle: Text(networkId),
+                  ),
+                  ListTile(
+                    title: Text('ConnectionType'),
+                    subtitle: Text(connectionType),
+                  ),
+                  ListTile(
+                    title: Text('SSID Hidden'),
+                    subtitle: Text(isHiddenSSid),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
