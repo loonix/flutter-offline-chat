@@ -24,11 +24,7 @@ class _ServerScreenState extends State<ServerScreen> {
 
   onData(Uint8List data) {
     DateTime time = DateTime.now();
-    serverLogs.add(time.hour.toString() +
-        "h" +
-        time.minute.toString() +
-        " : " +
-        String.fromCharCodes(data));
+    serverLogs.add(time.hour.toString() + "h" + time.minute.toString() + " : " + String.fromCharCodes(data));
     setState(() {});
   }
 
