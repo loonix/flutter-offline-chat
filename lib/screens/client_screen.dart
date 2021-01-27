@@ -11,25 +11,23 @@ class _ClientScreenState extends State<ClientScreen> {
   Client client;
   List<String> serverLogs = [];
   TextEditingController controller = TextEditingController();
+  var ipAddressController = TextEditingController();
 
   initState() {
     super.initState();
 
     client = Client(
-      hostname: "172.20.10.3",
+      hostname: "192.168.1.46",
       port: 4040,
       onData: this.onData,
       onError: this.onError,
     );
+    ipAddressController = TextEditingController(text: client.hostname);
   }
 
   onData(Uint8List data) {
     DateTime time = DateTime.now();
-    serverLogs.add(time.hour.toString() +
-        "h" +
-        time.minute.toString() +
-        " : " +
-        String.fromCharCodes(data));
+    serverLogs.add(time.hour.toString() + "h" + time.minute.toString() + " : " + String.fromCharCodes(data));
     setState(() {});
   }
 
@@ -49,8 +47,7 @@ class _ClientScreenState extends State<ClientScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text("WARNING"),
-          content:
-              Text("Leaving this page will disconnect you from the server"),
+          content: Text("Leaving this page will disconnect you from the server"),
           actions: <Widget>[
             FlatButton(
               child: Text("Exit", style: TextStyle(color: Colors.red)),
@@ -85,6 +82,21 @@ class _ClientScreenState extends State<ClientScreen> {
       ),
       body: Column(
         children: <Widget>[
+          TextField(
+            controller: ipAddressController,
+            decoration: InputDecoration(
+              hintText: "Enter an ip address",
+              labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+              prefixIcon: IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.connect_without_contact,
+                  size: 25,
+                  color: Colors.green[600],
+                ),
+              ),
+            ),
+          ),
           Expanded(
             flex: 1,
             child: Padding(
@@ -96,8 +108,7 @@ class _ClientScreenState extends State<ClientScreen> {
                     children: <Widget>[
                       Text(
                         "Client",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -121,6 +132,8 @@ class _ClientScreenState extends State<ClientScreen> {
                   RaisedButton(
                     child: Text(!client.connected ? 'Connect' : 'Disconnect'),
                     onPressed: () async {
+                      print(ipAddressController);
+                      client.hostname = ipAddressController.text;
                       if (client.connected) {
                         await client.disconnect();
                         this.serverLogs.clear();
