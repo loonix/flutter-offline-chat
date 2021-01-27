@@ -19,8 +19,7 @@ class Server {
       server = await ServerSocket.bind('0.0.0.0', 4040);
       this.running = true;
       server.listen(onRequest);
-      this.onData(
-          Uint8List.fromList('Server listening on port 4040'.codeUnits));
+      this.onData(Uint8List.fromList('Localhost Server listening on port 4040'.codeUnits));
     }, (Object error, StackTrace stack) async {
       this.onError(error);
     });

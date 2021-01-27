@@ -53,32 +53,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    String ipAddress =
-        _wifiObject != null ? _wifiObject.ipAddress.toString() : "ip";
+    String ipAddress = _wifiObject != null ? _wifiObject.ipAddress.toString() : "ip";
 
-    String routerIp =
-        _wifiObject != null ? _wifiObject.routerIp.toString() : "routerIp";
+    String routerIp = _wifiObject != null ? _wifiObject.routerIp.toString() : "routerIp";
     String dns1 = _wifiObject != null ? _wifiObject.dns1.toString() : "dns1";
     String dns2 = _wifiObject != null ? _wifiObject.dns2.toString() : "dns2";
     String bssId = _wifiObject != null ? _wifiObject.bssId.toString() : "bssId";
     String ssid = _wifiObject != null ? _wifiObject.ssid.toString() : "ssid";
-    String macAddress =
-        _wifiObject != null ? _wifiObject.macAddress.toString() : "macAddress";
-    String linkSpeed =
-        _wifiObject != null ? _wifiObject.linkSpeed.toString() : "linkSpeed";
-    String signalStrength = _wifiObject != null
-        ? _wifiObject.signalStrength.toString()
-        : "signalStrength";
-    String frequency =
-        _wifiObject != null ? _wifiObject.frequency.toString() : "frequency";
-    String networkId =
-        _wifiObject != null ? _wifiObject.networkId.toString() : "networkId";
-    String connectionType = _wifiObject != null
-        ? _wifiObject.connectionType.toString()
-        : "connectionType";
-    String isHiddenSSid = _wifiObject != null
-        ? _wifiObject.isHiddenSSid.toString()
-        : "isHiddenSSid";
+    String macAddress = _wifiObject != null ? _wifiObject.macAddress.toString() : "macAddress";
+    String linkSpeed = _wifiObject != null ? _wifiObject.linkSpeed.toString() : "linkSpeed";
+    String signalStrength = _wifiObject != null ? _wifiObject.signalStrength.toString() : "signalStrength";
+    String frequency = _wifiObject != null ? _wifiObject.frequency.toString() : "frequency";
+    String networkId = _wifiObject != null ? _wifiObject.networkId.toString() : "networkId";
+    String connectionType = _wifiObject != null ? _wifiObject.connectionType.toString() : "connectionType";
+    String isHiddenSSid = _wifiObject != null ? _wifiObject.isHiddenSSid.toString() : "isHiddenSSid";
 
     return Scaffold(
       appBar: AppBar(
