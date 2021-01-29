@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'dart:typed_data';
 
+import 'package:flutter_offline_chat/classes/general.dart';
 import 'package:flutter_offline_chat/classes/models.dart';
 
 class Server {
@@ -16,7 +17,7 @@ class Server {
 
   start() async {
     runZonedGuarded(() async {
-      server = await ServerSocket.bind('0.0.0.0', 4040);
+      server = await ServerSocket.bind(General.serverIp, General.defaultServerPort);
       this.running = true;
       server.listen(onRequest);
       this.onData(Uint8List.fromList('Localhost Server listening on port 4040'.codeUnits));
@@ -32,7 +33,7 @@ class Server {
   }
 
   broadCast(String message) {
-    this.onData(Uint8List.fromList('Broadcasting : $message'.codeUnits));
+    this.onData(Uint8List.fromList('Server: $message'.codeUnits));
     for (Socket socket in sockets) {
       socket.write(message + '\n');
     }
