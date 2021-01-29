@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline_chat/classes/client.dart';
+import 'package:flutter_offline_chat/classes/date_utils.dart';
+import 'package:flutter_offline_chat/classes/general.dart';
 
 class ClientScreen extends StatefulWidget {
   @override
@@ -12,13 +15,13 @@ class _ClientScreenState extends State<ClientScreen> {
   List<String> serverLogs = [];
   TextEditingController controller = TextEditingController();
   var ipAddressController = TextEditingController();
+  List<Socket> sockets = [];
 
   initState() {
     super.initState();
-
     client = Client(
       hostname: "192.168.1.46",
-      port: 4040,
+      port: General.defaultServerPort,
       onData: this.onData,
       onError: this.onError,
     );
@@ -26,8 +29,7 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   onData(Uint8List data) {
-    DateTime time = DateTime.now();
-    serverLogs.add(time.hour.toString() + "h" + time.minute.toString() + " : " + String.fromCharCodes(data));
+    serverLogs.add("${DateUtils.timestamp()}: ${String.fromCharCodes(data)}");
     setState(() {});
   }
 
@@ -41,30 +43,121 @@ class _ClientScreenState extends State<ClientScreen> {
     super.dispose();
   }
 
-  confirmReturn() {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("WARNING"),
-          content: Text("Leaving this page will disconnect you from the server"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Exit", style: TextStyle(color: Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
+  _connectToServer() {
+    return Container(
+      color: Colors.blueGrey[800],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
+            flex: 2,
+            child: TextField(
+              style: TextStyle(color: Colors.white),
+              controller: ipAddressController,
+              decoration: InputDecoration(
+                hintText: "Enter an ip address",
+                labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0, color: Colors.white70),
+                prefixIcon: IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.connect_without_contact,
+                    size: 25,
+                    color: Colors.green[600],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: RaisedButton(
+              color: Colors.blueGrey,
+              child: Text(
+                !client.connected ? 'Connect' : 'Disconnect',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                print(ipAddressController);
+                client.hostname = ipAddressController.text;
+                if (client.connected) {
+                  await client.disconnect();
+                  this.serverLogs.clear();
+                } else {
+                  await client.connect();
+                }
+                setState(() {});
               },
             ),
-            FlatButton(
-              child: Text("Cancel", style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          ),
+        ],
+      ),
+    );
+  }
+
+  _sendMessage() {
+    client.write(controller.text);
+    this.onData(Uint8List.fromList('Client: ${controller.text}'.codeUnits));
+    for (Socket socket in sockets) {
+      socket.write(controller.text + '\n');
+    }
+    controller.text = "";
+    if (FocusScope.of(context).isFirstFocus) {
+      FocusScope.of(context).requestFocus(new FocusNode());
+    }
+  }
+
+  _chat() {
+    return Expanded(
+      flex: 1,
+      child: ListView(
+        children: serverLogs.map((String log) {
+          return Padding(
+            padding: EdgeInsets.all(5),
+            child: Text(log, style: TextStyle(color: Colors.white)),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  _messageSender() {
+    return Container(
+      color: Colors.blueGrey[900],
+      height: 80,
+      padding: EdgeInsets.all(10),
+      child: Row(
+        children: <Widget>[
+          Flexible(
+            flex: 7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('Message:', style: TextStyle(fontSize: 8, color: Colors.white30)),
+                Expanded(flex: 1, child: TextFormField(style: TextStyle(color: Colors.white), controller: controller)),
+              ],
             ),
-          ],
-        );
-      },
+          ),
+          Flexible(
+            flex: 1,
+            child: MaterialButton(
+              onPressed: () => controller.text = "",
+              minWidth: 30,
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              child: Icon(Icons.clear, color: Colors.grey),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: MaterialButton(
+              onPressed: () => _sendMessage(),
+              minWidth: 30,
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              child: Icon(Icons.send, color: Colors.blue),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -72,150 +165,23 @@ class _ClientScreenState extends State<ClientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Server'),
+        title: Text('Client'),
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: confirmReturn,
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Column(
-        children: <Widget>[
-          TextField(
-            controller: ipAddressController,
-            decoration: InputDecoration(
-              hintText: "Enter an ip address",
-              labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-              prefixIcon: IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.connect_without_contact,
-                  size: 25,
-                  color: Colors.green[600],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15, top: 15),
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        "Client",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: client.connected ? Colors.green : Colors.red,
-                          borderRadius: BorderRadius.all(Radius.circular(3)),
-                        ),
-                        padding: EdgeInsets.all(5),
-                        child: Text(
-                          client.connected ? 'CONNECTED' : 'DISCONNECTED',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  RaisedButton(
-                    child: Text(!client.connected ? 'Connect' : 'Disconnect'),
-                    onPressed: () async {
-                      print(ipAddressController);
-                      client.hostname = ipAddressController.text;
-                      if (client.connected) {
-                        await client.disconnect();
-                        this.serverLogs.clear();
-                      } else {
-                        await client.connect();
-                      }
-                      setState(() {});
-                    },
-                  ),
-                  Divider(
-                    height: 30,
-                    thickness: 1,
-                    color: Colors.black12,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: ListView(
-                      children: serverLogs.map((String log) {
-                        return Padding(
-                          padding: EdgeInsets.only(top: 15),
-                          child: Text(log),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.grey,
-            height: 80,
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Message:',
-                        style: TextStyle(
-                          fontSize: 8,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: TextFormField(
-                          controller: controller,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 15,
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    controller.text = "";
-                  },
-                  minWidth: 30,
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  child: Icon(Icons.clear),
-                ),
-                SizedBox(
-                  width: 15,
-                ),
-                MaterialButton(
-                  onPressed: () {
-                    client.write(controller.text);
-                    controller.text = "";
-                  },
-                  minWidth: 30,
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  child: Icon(Icons.send),
-                )
-              ],
-            ),
-          ),
-        ],
+      body: Container(
+        color: Colors.blueGrey[800],
+        child: Column(
+          children: <Widget>[
+            _connectToServer(),
+            _chat(),
+            if (client.connected) _messageSender(),
+          ],
+        ),
       ),
     );
   }
