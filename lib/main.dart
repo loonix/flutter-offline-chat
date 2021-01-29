@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_offline_chat/classes/general.dart';
 import 'package:flutter_offline_chat/screens/client_screen.dart';
 import 'package:flutter_offline_chat/screens/server_screen.dart';
+import 'package:ping_discover_network/ping_discover_network.dart';
 import 'package:wifi_info_plugin/wifi_info_plugin.dart';
 
 void main() {
@@ -12,9 +14,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Offline Chat',
+      title: General.appName,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
       ),
       home: MyHomePage(),
     );
@@ -51,10 +54,23 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // TODO: Inteface for this
+  _swipeNetwork() {
+    final String ip = _wifiObject.ipAddress;
+    final String subnet = ip.substring(0, ip.lastIndexOf('.'));
+
+    var stream1 = NetworkAnalyzer.discover(subnet, General.defaultServerPort);
+    stream1.listen((NetworkAddress addr) {
+      print('${addr.ip} - No Channel');
+      if (addr.exists) {
+        print('Found device: ${addr.ip}');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String ipAddress = _wifiObject != null ? _wifiObject.ipAddress.toString() : "ip";
-
     String routerIp = _wifiObject != null ? _wifiObject.routerIp.toString() : "routerIp";
     String dns1 = _wifiObject != null ? _wifiObject.dns1.toString() : "dns1";
     String dns2 = _wifiObject != null ? _wifiObject.dns2.toString() : "dns2";
@@ -70,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Offline Chat'),
+        title: Text(General.appName),
       ),
       body: SingleChildScrollView(
         child: Column(
