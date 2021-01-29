@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   wifi_info_plugin: ^1.1.5
+  ping_discover_network: ^0.2.0+1
+  intl:
 
 
   cupertino_icons: ^1.0.0
