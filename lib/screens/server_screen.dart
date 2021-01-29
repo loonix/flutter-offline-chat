@@ -174,6 +174,9 @@ class _ServerScreenState extends State<ServerScreen> {
             onPressed: () {
               server.broadCast(controller.text);
               controller.text = "";
+              if (FocusScope.of(context).isFirstFocus) {
+                FocusScope.of(context).requestFocus(new FocusNode());
+              }
             },
             minWidth: 30,
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
