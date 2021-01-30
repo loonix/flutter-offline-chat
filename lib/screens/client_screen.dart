@@ -16,6 +16,7 @@ class _ClientScreenState extends State<ClientScreen> {
   TextEditingController controller = TextEditingController();
   var ipAddressController = TextEditingController();
   List<Socket> sockets = [];
+  String selectedServerIp;
 
   initState() {
     super.initState();
@@ -25,7 +26,7 @@ class _ClientScreenState extends State<ClientScreen> {
       onData: this.onData,
       onError: this.onError,
     );
-    ipAddressController = TextEditingController(text: client.hostname);
+    ipAddressController = TextEditingController(text: selectedServerIp);
   }
 
   onData(Uint8List data) {
@@ -163,6 +164,21 @@ class _ClientScreenState extends State<ClientScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var _args = ModalRoute.of(context).settings.arguments as dynamic;
+    if (_args != null) {
+      selectedServerIp = _args['selectedServerIp'] ?? null;
+      setState(() {
+        ipAddressController.text = selectedServerIp;
+        client.hostname = selectedServerIp;
+        try {
+          client.connect();
+          client.connected = true;
+        } catch (e) {
+          client.connected = true;
+        }
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Client'),
