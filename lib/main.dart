@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_offline_chat/classes/general.dart';
+import 'package:flutter_offline_chat/routes.dart';
 import 'package:flutter_offline_chat/screens/client_screen.dart';
+import 'package:flutter_offline_chat/screens/find_servers.dart';
 import 'package:flutter_offline_chat/screens/server_screen.dart';
-import 'package:ping_discover_network/ping_discover_network.dart';
 import 'package:wifi_info_plugin/wifi_info_plugin.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(FlutterOfflineChat());
 }
 
-class MyApp extends StatelessWidget {
+class FlutterOfflineChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,19 +20,23 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: MyHomePage(),
+      home: MainScreen(),
+      initialRoute: RouteNames.main,
+      navigatorObservers: [routeObserver],
+      routes: routes,
+      onUnknownRoute: (settings) => MaterialPageRoute(builder: (_) => MainScreen()),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
+class MainScreen extends StatefulWidget {
+  MainScreen({Key key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainScreenState extends State<MainScreen> {
   WifiInfoWrapper _wifiObject;
 
   @override
@@ -51,20 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _wifiObject = wifiObject;
-    });
-  }
-
-  // TODO: Inteface for this
-  _swipeNetwork() {
-    final String ip = _wifiObject.ipAddress;
-    final String subnet = ip.substring(0, ip.lastIndexOf('.'));
-
-    var stream1 = NetworkAnalyzer.discover(subnet, General.defaultServerPort);
-    stream1.listen((NetworkAddress addr) {
-      print('${addr.ip} - No Channel');
-      if (addr.exists) {
-        print('Found device: ${addr.ip}');
-      }
     });
   }
 
@@ -104,6 +95,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
+            ),
+            Card(
+              child: ListTile(
+                title: Text('Find Servers'),
+                onTap: () => {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FindServers(wirelessInfo: _wifiObject)),
+                  )
+                },
               ),
             ),
             Card(
