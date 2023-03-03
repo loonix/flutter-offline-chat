@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline_chat/classes/server.dart';
 
@@ -9,7 +8,7 @@ class ServerScreen extends StatefulWidget {
 }
 
 class _ServerScreenState extends State<ServerScreen> {
-  Server server;
+  late Server server;
   List<String> serverLogs = [];
   TextEditingController controller = TextEditingController();
 
@@ -46,14 +45,14 @@ class _ServerScreenState extends State<ServerScreen> {
           title: Text("WARNING"),
           content: Text("Leaving this screen will disconnect the server"),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text("Exit", style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
             ),
-            FlatButton(
+            TextButton(
               child: Text("Cancel", style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -94,8 +93,16 @@ class _ServerScreenState extends State<ServerScreen> {
             ),
           ],
         ),
-        RaisedButton(
-          color: server.running ? Colors.red : Colors.green,
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            fixedSize: Size(90, 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(24.0),
+              ),
+            ),
+          ),
+          // color: server.running ? Colors.red : Colors.green,
           child: server.running
               ? Icon(
                   Icons.stop,

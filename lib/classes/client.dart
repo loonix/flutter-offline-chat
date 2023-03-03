@@ -11,18 +11,18 @@ class Client {
     this.port,
   });
 
-  String hostname;
-  int port;
-  Uint8ListCallback onData;
-  DynamicCallback onError;
+  String? hostname;
+  int? port;
+  Uint8ListCallback? onData;
+  DynamicCallback? onError;
   bool connected = false;
 
-  Socket socket;
+  Socket? socket;
 
   connect() async {
     try {
       socket = await Socket.connect(hostname, 4040);
-      socket.listen(
+      socket!.listen(
         onData,
         onError: onError,
         onDone: disconnect,
@@ -30,18 +30,18 @@ class Client {
       );
       connected = true;
     } on Exception catch (exception) {
-      onData(Uint8List.fromList("Error : $exception".codeUnits));
+      onData!(Uint8List.fromList("Error : $exception".codeUnits));
     }
   }
 
   write(String message) {
     //Connect standard in to the socket
-    socket.write(message + '\n');
+    socket!.write(message + '\n');
   }
 
   disconnect() {
     if (socket != null) {
-      socket.destroy();
+      socket!.destroy();
       connected = false;
     }
   }

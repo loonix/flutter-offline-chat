@@ -5,13 +5,13 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  wifi_info_plugin: ^1.1.5
-  ping_discover_network: ^0.2.0+1
+  wifi_info_plugin_plus: ^2.0.2
+  ping_discover_network_v2: ^0.0.2
   intl:
 
 

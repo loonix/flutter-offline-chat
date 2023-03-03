@@ -27,3 +27,6 @@ To connect the phones, at least 1 needs to be the server.
 * Client > Write the ip address of the server (you can get it from the server phone) > Tap Connect
 
 After this you can just write a message on each phone.
+
+### Run on macos
+`flutter run -d macos`

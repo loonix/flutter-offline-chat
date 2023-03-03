@@ -5,7 +5,7 @@ import 'package:flutter_offline_chat/routes.dart';
 import 'package:flutter_offline_chat/screens/client_screen.dart';
 import 'package:flutter_offline_chat/screens/find_servers.dart';
 import 'package:flutter_offline_chat/screens/server_screen.dart';
-import 'package:wifi_info_plugin/wifi_info_plugin.dart';
+import 'package:wifi_info_plugin_plus/wifi_info_plugin_plus.dart';
 
 void main() {
   runApp(FlutterOfflineChat());
@@ -30,14 +30,14 @@ class FlutterOfflineChat extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  MainScreen({Key key}) : super(key: key);
+  MainScreen({Key? key}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  WifiInfoWrapper _wifiObject;
+  WifiInfoWrapper? _wifiObject;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    WifiInfoWrapper wifiObject;
+    WifiInfoWrapper? wifiObject;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       wifiObject = await WifiInfoPlugin.wifiDetails;
@@ -61,19 +61,19 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String ipAddress = _wifiObject != null ? _wifiObject.ipAddress.toString() : "ip";
-    String routerIp = _wifiObject != null ? _wifiObject.routerIp.toString() : "routerIp";
-    String dns1 = _wifiObject != null ? _wifiObject.dns1.toString() : "dns1";
-    String dns2 = _wifiObject != null ? _wifiObject.dns2.toString() : "dns2";
-    String bssId = _wifiObject != null ? _wifiObject.bssId.toString() : "bssId";
-    String ssid = _wifiObject != null ? _wifiObject.ssid.toString() : "ssid";
-    String macAddress = _wifiObject != null ? _wifiObject.macAddress.toString() : "macAddress";
-    String linkSpeed = _wifiObject != null ? _wifiObject.linkSpeed.toString() : "linkSpeed";
-    String signalStrength = _wifiObject != null ? _wifiObject.signalStrength.toString() : "signalStrength";
-    String frequency = _wifiObject != null ? _wifiObject.frequency.toString() : "frequency";
-    String networkId = _wifiObject != null ? _wifiObject.networkId.toString() : "networkId";
-    String connectionType = _wifiObject != null ? _wifiObject.connectionType.toString() : "connectionType";
-    String isHiddenSSid = _wifiObject != null ? _wifiObject.isHiddenSSid.toString() : "isHiddenSSid";
+    String ipAddress = _wifiObject != null ? _wifiObject!.ipAddress.toString() : "ip";
+    String routerIp = _wifiObject != null ? _wifiObject!.routerIp.toString() : "routerIp";
+    String dns1 = _wifiObject != null ? _wifiObject!.dns1.toString() : "dns1";
+    String dns2 = _wifiObject != null ? _wifiObject!.dns2.toString() : "dns2";
+    String bssId = _wifiObject != null ? _wifiObject!.bssId.toString() : "bssId";
+    String ssid = _wifiObject != null ? _wifiObject!.ssid.toString() : "ssid";
+    String macAddress = _wifiObject != null ? _wifiObject!.macAddress.toString() : "macAddress";
+    String linkSpeed = _wifiObject != null ? _wifiObject!.linkSpeed.toString() : "linkSpeed";
+    String signalStrength = _wifiObject != null ? _wifiObject!.signalStrength.toString() : "signalStrength";
+    String frequency = _wifiObject != null ? _wifiObject!.frequency.toString() : "frequency";
+    String networkId = _wifiObject != null ? _wifiObject!.networkId.toString() : "networkId";
+    String connectionType = _wifiObject != null ? _wifiObject!.connectionType.toString() : "connectionType";
+    String isHiddenSSid = _wifiObject != null ? _wifiObject!.isHiddenSSid.toString() : "isHiddenSSid";
 
     return Scaffold(
       appBar: AppBar(

@@ -1,15 +1,13 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline_chat/classes/general.dart';
 import 'package:flutter_offline_chat/routes.dart';
-import 'package:ping_discover_network/ping_discover_network.dart';
-import 'package:wifi_info_plugin/wifi_info_plugin.dart';
+import 'package:ping_discover_network_v2/ping_discover_network_v2.dart';
+import 'package:wifi_info_plugin_plus/wifi_info_plugin_plus.dart';
 
 class FindServers extends StatefulWidget {
-  final WifiInfoWrapper wirelessInfo;
-  FindServers({Key key, this.wirelessInfo}) : super(key: key);
+  final WifiInfoWrapper? wirelessInfo;
+  FindServers({Key? key, this.wirelessInfo}) : super(key: key);
 
   @override
   _FindServersState createState() => _FindServersState();
@@ -17,8 +15,8 @@ class FindServers extends StatefulWidget {
 
 class _FindServersState extends State<FindServers> {
   List<String> ipAddressesFound = [];
-  StreamSubscription<NetworkAddress> streamSubscription;
-  bool inProgress;
+  late StreamSubscription<NetworkAddress> streamSubscription;
+  bool? inProgress;
   @override
   void initState() {
     inProgress = false;
@@ -32,7 +30,7 @@ class _FindServersState extends State<FindServers> {
   }
 
   _swipeNetwork() {
-    String ip = widget.wirelessInfo.ipAddress;
+    String ip = widget.wirelessInfo!.ipAddress;
     String subnet = ip.substring(0, ip.lastIndexOf('.'));
     Stream<NetworkAddress> networkStream = NetworkAnalyzer.discover(subnet, General.defaultServerPort);
     streamSubscription = networkStream.listen((NetworkAddress addr) {

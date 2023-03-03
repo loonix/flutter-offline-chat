@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline_chat/classes/client.dart';
-import 'package:flutter_offline_chat/classes/date_utils.dart';
 import 'package:flutter_offline_chat/classes/general.dart';
 
 class ClientScreen extends StatefulWidget {
@@ -11,12 +10,12 @@ class ClientScreen extends StatefulWidget {
 }
 
 class _ClientScreenState extends State<ClientScreen> {
-  Client client;
+  late Client client;
   List<String> serverLogs = [];
   TextEditingController controller = TextEditingController();
   var ipAddressController = TextEditingController();
   List<Socket> sockets = [];
-  String selectedServerIp;
+  String? selectedServerIp;
 
   initState() {
     super.initState();
@@ -30,7 +29,7 @@ class _ClientScreenState extends State<ClientScreen> {
   }
 
   onData(Uint8List data) {
-    serverLogs.add("${DateUtils.timestamp()}: ${String.fromCharCodes(data)}");
+    serverLogs.add("${DateTime.now()}: ${String.fromCharCodes(data)}");
     setState(() {});
   }
 
@@ -72,12 +71,7 @@ class _ClientScreenState extends State<ClientScreen> {
           ),
           Flexible(
             flex: 1,
-            child: RaisedButton(
-              color: Colors.blueGrey,
-              child: Text(
-                !client.connected ? 'Connect' : 'Disconnect',
-                style: TextStyle(color: Colors.white),
-              ),
+            child: ElevatedButton(
               onPressed: () async {
                 print(ipAddressController);
                 client.hostname = ipAddressController.text;
@@ -89,6 +83,15 @@ class _ClientScreenState extends State<ClientScreen> {
                 }
                 setState(() {});
               },
+              style: ElevatedButton.styleFrom(
+                fixedSize: Size(90, 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(24.0),
+                  ),
+                ),
+              ),
+              child: Text("ok"),
             ),
           ),
         ],
@@ -164,11 +167,11 @@ class _ClientScreenState extends State<ClientScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var _args = ModalRoute.of(context).settings.arguments as dynamic;
+    var _args = ModalRoute.of(context)!.settings.arguments as dynamic;
     if (_args != null) {
       selectedServerIp = _args['selectedServerIp'] ?? null;
       setState(() {
-        ipAddressController.text = selectedServerIp;
+        ipAddressController.text = selectedServerIp!;
         client.hostname = selectedServerIp;
         try {
           client.connect();
