@@ -11,6 +11,7 @@ class _ServerScreenState extends State<ServerScreen> {
   late Server server;
   List<String> serverLogs = [];
   TextEditingController controller = TextEditingController();
+  TextEditingController portController = TextEditingController(text: General.defaultServerPort.toString());
 
   initState() {
     super.initState();
@@ -93,6 +94,22 @@ class _ServerScreenState extends State<ServerScreen> {
             ),
           ],
         ),
+        Row(
+          children: [
+            SizedBox(
+              width: 60,
+              child: TextField(
+                controller: portController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Port',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                ),
+              ),
+            ),
+          ],
+        ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             fixedSize: Size(90, 15),
@@ -117,7 +134,12 @@ class _ServerScreenState extends State<ServerScreen> {
               await server.stop();
               this.serverLogs.clear();
             } else {
-              await server.start();
+              int? port = int.tryParse(portController.text);
+              if (port != null) {
+                await server.start(port: port);
+              } else {
+                await server.start();
+              }
             }
             setState(() {});
           },
@@ -202,9 +224,29 @@ class _ServerScreenState extends State<ServerScreen> {
       flex: 1,
       child: ListView(
         children: serverLogs.map((String log) {
+          // Check if the message is from a client or server
+          bool isClientMessage = log.contains("Client:");
+          String displayText = log;
+
+          // Format the text for better readability
+          TextStyle style = TextStyle(
+            fontSize: 16,
+            color: isClientMessage ? Colors.blue : Colors.green,
+          );
+
           return Padding(
-            padding: EdgeInsets.only(top: 15),
-            child: Text(log),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            child: Align(
+              alignment: isClientMessage ? Alignment.centerLeft : Alignment.centerRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isClientMessage ? Colors.blue[100] : Colors.green[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: EdgeInsets.all(8),
+                child: Text(displayText, style: style),
+              ),
+            ),
           );
         }).toList(),
       ),

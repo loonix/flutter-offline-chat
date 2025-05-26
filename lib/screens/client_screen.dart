@@ -14,6 +14,7 @@ class _ClientScreenState extends State<ClientScreen> {
   List<String> serverLogs = [];
   TextEditingController controller = TextEditingController();
   var ipAddressController = TextEditingController();
+  var portController = TextEditingController(text: General.defaultServerPort.toString());
   List<Socket> sockets = [];
   String? selectedServerIp;
 
@@ -21,7 +22,6 @@ class _ClientScreenState extends State<ClientScreen> {
     super.initState();
     client = Client(
       hostname: "192.168.1.46",
-      port: General.defaultServerPort,
       onData: this.onData,
       onError: this.onError,
     );
@@ -69,17 +69,31 @@ class _ClientScreenState extends State<ClientScreen> {
               ),
             ),
           ),
+          SizedBox(width: 10),
+          Flexible(
+            flex: 1,
+            child: TextField(
+              style: TextStyle(color: Colors.white),
+              controller: portController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: "Port",
+                labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0, color: Colors.white70),
+              ),
+            ),
+          ),
           Flexible(
             flex: 1,
             child: ElevatedButton(
               onPressed: () async {
                 print(ipAddressController);
                 client.hostname = ipAddressController.text;
+                int? port = int.tryParse(portController.text);
                 if (client.connected) {
                   await client.disconnect();
                   this.serverLogs.clear();
                 } else {
-                  await client.connect();
+                  await client.connect(port: port);
                 }
                 setState(() {});
               },
@@ -116,9 +130,29 @@ class _ClientScreenState extends State<ClientScreen> {
       flex: 1,
       child: ListView(
         children: serverLogs.map((String log) {
+          // Check if the message is from a client or server
+          bool isServerMessage = log.contains("Server:");
+          String displayText = log;
+
+          // Format the text for better readability
+          TextStyle style = TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+          );
+
           return Padding(
-            padding: EdgeInsets.all(5),
-            child: Text(log, style: TextStyle(color: Colors.white)),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            child: Align(
+              alignment: isServerMessage ? Alignment.centerLeft : Alignment.centerRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isServerMessage ? Colors.green[700] : Colors.blue[700],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: EdgeInsets.all(8),
+                child: Text(displayText, style: style),
+              ),
+            ),
           );
         }).toList(),
       ),

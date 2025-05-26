@@ -15,12 +15,15 @@ class Server {
   bool running = false;
   List<Socket> sockets = [];
 
-  start() async {
+  int? customPort;
+
+  start({int? port}) async {
     runZonedGuarded(() async {
-      server = await ServerSocket.bind(General.serverIp, General.defaultServerPort);
+      customPort = port;
+      server = await ServerSocket.bind(General.serverIp, port ?? General.defaultServerPort);
       this.running = true;
       server!.listen(onRequest);
-      this.onData!(Uint8List.fromList('Localhost Server listening on port 4040'.codeUnits));
+      this.onData!(Uint8List.fromList('Localhost Server listening on port ${port ?? General.defaultServerPort}'.codeUnits));
     }, (Object error, StackTrace stack) async {
       this.onError!(error);
     });
