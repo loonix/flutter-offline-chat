@@ -19,9 +19,10 @@ class Client {
 
   Socket? socket;
 
-  connect() async {
+  connect({int? port}) async {
     try {
-      socket = await Socket.connect(hostname, 4040);
+      int connectionPort = port ?? General.defaultServerPort;
+      socket = await Socket.connect(hostname, connectionPort);
       socket!.listen(
         onData,
         onError: onError,
@@ -29,6 +30,7 @@ class Client {
         cancelOnError: false,
       );
       connected = true;
+      onData!(Uint8List.fromList("Connected to ${hostname}:${connectionPort}".codeUnits));
     } on Exception catch (exception) {
       onData!(Uint8List.fromList("Error : $exception".codeUnits));
     }
